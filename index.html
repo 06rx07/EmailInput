@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
-<body>
+<body onload="focusInput()">
     <div class="wrapper">
         <input id="email-input" type="text" oninput="addEmailList(event)" onkeydown="handleKeydown(event)" />
         <ul id="email-sug-wrapper" class="email-sug" onclick="completeEmail(event)"></ul>

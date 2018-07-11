@@ -5,6 +5,10 @@ const list = document.querySelector('#email-sug-wrapper');
 
 var selectedIndex = 0;
 
+function focusInput() {
+    input.focus();
+}
+
 function addEmailList(event) {
     const inputTexts = formatInput(event.target.value);
     getOptions(inputTexts);
@@ -15,6 +19,7 @@ function completeEmail(event) {
     if (event.target.localName === 'li') {
         input.value = event.target.textContent;
         removeOptions();
+        focusInput();
     }
 }
 
@@ -53,14 +58,10 @@ function formatInput(inputText) {
     return inputText.split('@').map(splitText => splitText.trim());
 }
 
-function highlightOption(index) {
-    if (list.childNodes.length && list.childNodes[index]) {
-        list.childNodes[index].classList.add('selected');
-        selectedIndex = index;
-    }
-}
-
 function handleKeydown(event) {
+    if (event.key === 'Escape') {
+        input.select();
+    }
     if (list.childNodes.length) {
         list.childNodes[selectedIndex].classList.remove('selected');
         if (event.key === 'ArrowDown') {
@@ -70,6 +71,13 @@ function handleKeydown(event) {
         } else if (event.key === 'Enter') {
             selectCurrentOption();
         }
+    }
+}
+
+function highlightOption(index) {
+    if (list.childNodes.length && list.childNodes[index]) {
+        list.childNodes[index].classList.add('selected');
+        selectedIndex = index;
     }
 }
 
