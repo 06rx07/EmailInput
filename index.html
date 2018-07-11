@@ -9,7 +9,7 @@
 
 <body>
     <div class="wrapper">
-        <input id="email-input" type="text" oninput="addEmailList(event)" />
+        <input id="email-input" type="text" oninput="addEmailList(event)" onkeydown="handleKeydown(event)" />
         <ul id="email-sug-wrapper" class="email-sug" onclick="completeEmail(event)"></ul>
     </div>
 

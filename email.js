@@ -3,14 +3,17 @@ const postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
 const input = document.querySelector('#email-input');
 const list = document.querySelector('#email-sug-wrapper');
 
+var selectedIndex = 0;
+
 function addEmailList(event) {
     const inputTexts = formatInput(event.target.value);
     getOptions(inputTexts);
+    highlightOption(0);
 }
 
 function completeEmail(event) {
     if (event.target.localName === 'li') {
-        input.value = event.target.innerHTML;
+        input.value = event.target.textContent;
         removeOptions();
     }
 }
@@ -48,4 +51,40 @@ function filterPostfix(inputPostfix) {
 
 function formatInput(inputText) {
     return inputText.split('@').map(splitText => splitText.trim());
+}
+
+function highlightOption(index) {
+    if (list.childNodes.length && list.childNodes[index]) {
+        list.childNodes[index].classList.add('selected');
+        selectedIndex = index;
+    }
+}
+
+function handleKeydown(event) {
+    if (list.childNodes.length) {
+        list.childNodes[selectedIndex].classList.remove('selected');
+        if (event.key === 'ArrowDown') {
+            getNextOption(1);
+        } else if (event.key === 'ArrowUp') {
+            getNextOption(-1);
+        } else if (event.key === 'Enter') {
+            selectCurrentOption();
+        }
+    }
+}
+
+function getNextOption(down) {
+    const nodeLength = list.childNodes.length;
+    if (selectedIndex + down >= 0 && selectedIndex + down <= nodeLength - 1) {
+        highlightOption(selectedIndex + down);
+    } else if (down < 0) {
+        highlightOption(nodeLength - 1);
+    } else if (down > 0) {
+        highlightOption(0);
+    }
+}
+
+function selectCurrentOption() {
+    input.value = list.childNodes[selectedIndex].textContent;
+    removeOptions();
 }
