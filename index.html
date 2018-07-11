@@ -9,8 +9,8 @@
 
 <body onload="focusInput()">
     <div class="wrapper">
-        <input id="email-input" type="text" oninput="addEmailList(event)" onkeydown="handleKeydown(event)" />
-        <ul id="email-sug-wrapper" class="email-sug" onclick="completeEmail(event)"></ul>
+        <input id="email-input" type="text" oninput="handleInput.addEmailList(event)" onkeydown="handleKeydown.handler(event)" />
+        <ul id="email-sug-wrapper" class="email-sug" onclick="handleInput.completeEmail(event)"></ul>
     </div>
 
     <script src='./email.js'></script>

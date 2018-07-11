@@ -9,106 +9,104 @@ function focusInput() {
     input.focus();
 }
 
-function addEmailList(event) {
-    const inputTexts = formatInput(input.value);
-    getOptions(inputTexts);
-    highlightOption(0);
-}
-
-function completeEmail(event) {
-    if (event.target.localName === 'li') {
-        input.value = htmlDecode(event.target.innerHTML);
-        removeOptions();
-        focusInput();
-    }
-}
-
-function getOptions(inputTexts) {
-    removeOptions();
-    list.style.visibility = 'hidden';
-    if (inputTexts[0]) {
-        createOptions(inputTexts);
-        list.style.visibility = 'visible';
-    }
-}
-
-function removeOptions() {
-    const length = list.childNodes.length;
-    for (i = 0; i < length; i++) {
-        list.removeChild(list.lastChild);
-    }
-}
-
-function createOptions(inputTexts) {
-    const filteredList = filterPostfix(inputTexts[1] || '');
-    for (let postfix of filteredList) {
-        const node = document.createElement('li');
-        const text = document.createTextNode(htmlEncode(inputTexts[0] + '@' + postfix));
-        node.appendChild(text);
-        list.appendChild(node);
-    }
-}
-
-function filterPostfix(inputPostfix) {
-    const filtered = postfixList.filter(postfix => new RegExp('^' + inputPostfix, 'gi').test(postfix));
-    return (filtered.length) ? filtered : postfixList;
-}
-
-function formatInput(inputText) {
-    return inputText.split('@').map(splitText => splitText.trim());
-}
-
-function handleKeydown(event) {
-    if (event.key === 'Escape') {
-        input.select();
-    }
-    if (list.childNodes.length) {
-        list.childNodes[selectedIndex].classList.remove('selected');
-        if (event.key === 'ArrowDown') {
-            getNextOption(1);
-        } else if (event.key === 'ArrowUp') {
-            getNextOption(-1);
-        } else if (event.key === 'Enter') {
-            selectCurrentOption();
+const handleInput = {
+    addEmailList: function(event) {
+        const inputTexts = this.formatInput(input.value);
+        this.getOptions(inputTexts);
+        handleKeydown.highlightOption(0);
+    },
+    completeEmail: function(event) {
+        if (event.target.localName === 'li') {
+            input.value = htmlUtil.htmlDecode(event.target.innerHTML);
+            this.removeOptions();
+            focusInput();
         }
+    },
+    getOptions: function(inputTexts) {
+        this.removeOptions();
+        list.style.visibility = 'hidden';
+        if (inputTexts[0]) {
+            this.createOptions(inputTexts);
+            list.style.visibility = 'visible';
+        }
+    },
+    removeOptions: function() {
+        const length = list.childNodes.length;
+        for (i = 0; i < length; i++) {
+            list.removeChild(list.lastChild);
+        }
+    },
+    createOptions: function(inputTexts) {
+        const filteredList = this.filterPostfix(inputTexts[1] || '');
+        for (let postfix of filteredList) {
+            const node = document.createElement('li');
+            const encodedText = htmlUtil.htmlEncode(inputTexts[0] + '@' + postfix);
+            const text = document.createTextNode(encodedText);
+            node.appendChild(text);
+            list.appendChild(node);
+        }
+    },
+    filterPostfix: function(inputPostfix) {
+        const filtered = postfixList.filter(postfix => new RegExp('^' + inputPostfix, 'gi').test(postfix));
+        return (filtered.length) ? filtered : postfixList;
+    },
+    formatInput: function(inputText) {
+        return inputText.split('@').map(splitText => splitText.trim());
     }
-}
 
-function highlightOption(index) {
-    if (list.childNodes.length && list.childNodes[index]) {
-        list.childNodes[index].classList.add('selected');
-        selectedIndex = index;
+};
+
+const handleKeydown = {
+    handler: function(event) {
+        if (event.key === 'Escape') {
+            input.select();
+        }
+        if (list.childNodes.length) {
+            list.childNodes[selectedIndex].classList.remove('selected');
+            if (event.key === 'ArrowDown') {
+                this.getNextOption(1);
+            } else if (event.key === 'ArrowUp') {
+                this.getNextOption(-1);
+            } else if (event.key === 'Enter') {
+                this.selectCurrentOption();
+            }
+        }
+    },
+    highlightOption: function(index) {
+        if (list.childNodes.length && list.childNodes[index]) {
+            list.childNodes[index].classList.add('selected');
+            selectedIndex = index;
+        }
+    },
+    getNextOption: function(down) {
+        const nodeLength = list.childNodes.length;
+        if (selectedIndex + down >= 0 && selectedIndex + down <= nodeLength - 1) {
+            this.highlightOption(selectedIndex + down);
+        } else if (down < 0) {
+            this.highlightOption(nodeLength - 1);
+        } else if (down > 0) {
+            this.highlightOption(0);
+        }
+    },
+    selectCurrentOption: function() {
+        input.value = list.childNodes[selectedIndex].textContent;
+        handleInput.removeOptions();
     }
-}
+};
 
-function getNextOption(down) {
-    const nodeLength = list.childNodes.length;
-    if (selectedIndex + down >= 0 && selectedIndex + down <= nodeLength - 1) {
-        highlightOption(selectedIndex + down);
-    } else if (down < 0) {
-        highlightOption(nodeLength - 1);
-    } else if (down > 0) {
-        highlightOption(0);
+const htmlUtil = {
+    htmlEncode: function(html) {
+        var temp = document.createElement("div");
+        (temp.textContent != undefined) ? (temp.textContent = html) : (temp.innerText = html);
+        var output = temp.innerHTML;
+        temp = null;
+        return output;
+    },
+    htmlDecode: function(text) {
+        var temp = document.createElement("div");
+        temp.innerHTML = text;
+        var output = temp.innerText || temp.textContent;
+        temp = null;
+        return output;
     }
-}
-
-function selectCurrentOption() {
-    input.value = list.childNodes[selectedIndex].textContent;
-    removeOptions();
-}
-
-function htmlEncode(html) {
-    var temp = document.createElement("div");
-    (temp.textContent != undefined) ? (temp.textContent = html) : (temp.innerText = html);
-    var output = temp.innerHTML;
-    temp = null;
-    return output;
-}
-
-function htmlDecode(text) {
-    var temp = document.createElement("div");
-    temp.innerHTML = text;
-    var output = temp.innerText || temp.textContent;
-    temp = null;
-    return output;
-}
+};
