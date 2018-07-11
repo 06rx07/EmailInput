@@ -10,14 +10,14 @@ function focusInput() {
 }
 
 function addEmailList(event) {
-    const inputTexts = formatInput(event.target.value);
+    const inputTexts = formatInput(input.value);
     getOptions(inputTexts);
     highlightOption(0);
 }
 
 function completeEmail(event) {
     if (event.target.localName === 'li') {
-        input.value = event.target.textContent;
+        input.value = htmlDecode(event.target.innerHTML);
         removeOptions();
         focusInput();
     }
@@ -43,7 +43,7 @@ function createOptions(inputTexts) {
     const filteredList = filterPostfix(inputTexts[1] || '');
     for (let postfix of filteredList) {
         const node = document.createElement('li');
-        const text = document.createTextNode(inputTexts[0] + '@' + postfix);
+        const text = document.createTextNode(htmlEncode(inputTexts[0] + '@' + postfix));
         node.appendChild(text);
         list.appendChild(node);
     }
@@ -95,4 +95,20 @@ function getNextOption(down) {
 function selectCurrentOption() {
     input.value = list.childNodes[selectedIndex].textContent;
     removeOptions();
+}
+
+function htmlEncode(html) {
+    var temp = document.createElement("div");
+    (temp.textContent != undefined) ? (temp.textContent = html) : (temp.innerText = html);
+    var output = temp.innerHTML;
+    temp = null;
+    return output;
+}
+
+function htmlDecode(text) {
+    var temp = document.createElement("div");
+    temp.innerHTML = text;
+    var output = temp.innerText || temp.textContent;
+    temp = null;
+    return output;
 }
